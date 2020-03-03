@@ -3,66 +3,64 @@
 """
 Module docstring: One line description of what your program does.
 """
-#__author__ = Julita, Joshua
+__author__ = "Julita, Joshua, and Demo"
 
 import sys
-open_b =[ '[', '(', '<', '{', '(*']
-closed_b = [ ']', ')', '>', '}', '*)']
+openers = [ '[', '(', '<', '{', '(*']
+closers = [ ']', ')', '>', '}', '*)']
 
 
-def is_nested2(line):
+def is_nested(line):
+
     stack = []
-    i = 0
-    #(*a++(*)
-    while i < len(line):
-        if i+2 < len(line) and line[i: i+2] in open_b:
-            stack.append(line[i: i+2])
-            i += 1
-        elif i + 2 < len(line) and line[i:i+2] in closed_b:
-            if len(stack) == 0:
-                print("No", i)
-                return
-            tem = stack.pop()
-            if open_b.index(tem) != closed_b.index(line[i:i+2]):
-                print("No", i)
-                return
-            i += 1
-        elif line[i] in open_b:
-            stack.append(line[i])
-        elif line[i] in closed_b:
-            if len(stack) == 0:
-                print("No", i)
-                return
-            tem =  stack.pop()
-            if open_b.index(tem) != closed_b.index(line[i]):
-                print("No", i)
-                return
-        i += 1
+    token_counter = 0
+    while line:
+        # figure out what my token is the time thru the loop
+        token = line[0]
+        if line.startswith("(*"):
+            token = "(*"
+        elif line.startswith("*)"):
+            token = "*)"
+
+        token_counter += 1
+        line = line[len(token):]
+
+        if token in openers:
+            stack.append(token)
+        elif token in closers:
+            closer_index = closers.index(token)
+            expected_opener = openers[closer_index]
+            if stack.pop() != expected_opener:
+                return "NO " + str(token_counter)        
+    
+    if stack:
+            
+            return "NO " + str(token_counter)
+
+    return "YES"
         
-    if len(stack) > 0:
-        print("No", i)
-    else:
-        print("Yes")
-
-
+    
 def read_file(filename):
     with open(filename, 'r') as f:
         for string in f:
-            is_nested2(string)
+            is_nested(string)
 
     
-
 
 def main(args):
     """Open the input file and call `is_nested()` for each line"""
-    # Results: print to console and also write to output file
-    if len(args) !=2:
-       print('usage: python nested.py output.txt')
-       sys.exit(1)
-    read_file("input.txt")
     
+    print("Testing for Nesting: {}".format(args[0]))
+    with open(args[0]) as ifile:
+        with open('output.txt', 'w') as ofile:
+            for line in ifile:
+                result_str = is_nested(line)
+                print(result_str)
+                ofile.write(result_str + '\n')
+
+
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(sys.argv[1:])
 
