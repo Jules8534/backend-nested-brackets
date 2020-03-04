@@ -15,7 +15,7 @@ def is_nested(line):
     stack = []
     token_counter = 0
     while line:
-        # figure out what my token is the time thru the loop
+
         token = line[0]
         if line.startswith("(*"):
             token = "(*"
